@@ -4,21 +4,23 @@ import cv2
 import math
 print(cv2.__version__)
 
+# classifier file
 cascade_src = 'cars.xml'
 video_src = 'dataset/v2.mp4'
-#video_src = 'dataset/video2.avi'
 
 cap = cv2.VideoCapture(video_src)
 car_cascade = cv2.CascadeClassifier(cascade_src)
-reti, imgo = cap.read()
+
+# scale video feed
 s = 1.0
 
-
+# height of car IRL in meters
 dh = 2.0
-camdim = [4.89,3.67]
-fl = 4.12
 
-#fgbg = cv2.createBackgroundSubtractorKNN(500,400)
+# camera specs
+camdim = [4.89,3.67]    # width and height of CCD in mm
+fl = 4.12               # focal length of lense in meters
+
 
 while True:
     ret, img = cap.read()
@@ -29,14 +31,10 @@ while True:
 
     img = cv2.resize(img,(int(s*width), int(s*height)), interpolation = cv2.INTER_CUBIC)
 
-
-    #FoV = 2*math.atan((camdim[1]/2)/fl)
-    #flpx = (height * 0.5) / math.tan(FoV * 0.5)
-
+    # ratio of height in pixels on screen to distance IRL in meters
     q = (fl * dh * width * s) / camdim[0]
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    #gray = fgbg.apply(img) #cv2.absdiff(img,imgo)
 
     cars = car_cascade.detectMultiScale(gray, 1.1, 1)
 
@@ -52,5 +50,4 @@ while True:
     if cv2.waitKey(33) == 27:
         break
 
-    imgo = img
 cv2.destroyAllWindows()
